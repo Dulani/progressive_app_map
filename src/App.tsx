@@ -5,12 +5,17 @@ import './App.css'
 import L from 'leaflet'
 
 // Fix Leaflet default marker icon issue
-delete (L.Icon.Default.prototype as any)._getIconUrl
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
+const DefaultIcon = L.icon({
   iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
   shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
 })
+
+L.Marker.prototype.options.icon = DefaultIcon
 
 function LocationMarker() {
   const [position, setPosition] = useState<[number, number] | null>(null)
@@ -32,11 +37,13 @@ function App() {
   const defaultPosition: [number, number] = [51.505, -0.09] // Default to London
 
   return (
-    <div className="w-full h-full min-h-screen">
+    <div style={{ width: '100%', height: '100%', position: 'relative' }}>
       <MapContainer
         center={defaultPosition}
         zoom={13}
-        className="w-full h-full min-h-screen"
+        style={{ width: '100%', height: '100%' }}
+        zoomControl={false}
+        attributionControl={false}
       >
         <TileLayer
           url={import.meta.env.VITE_MAP_TILE_URL}
