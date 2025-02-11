@@ -4,6 +4,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/progressive_app_map/',
   plugins: [
     react(),
     VitePWA({
@@ -15,15 +16,15 @@ export default defineConfig({
         theme_color: '#ffffff',
         icons: [
           {
-            src: '/vite.svg',
+            src: './vite.svg',
             sizes: '192x192',
             type: 'image/svg+xml'
           }
         ],
         background_color: '#ffffff',
         display: 'standalone',
-        start_url: '/',
-        scope: '/'
+        start_url: './',
+        scope: './'
       }
     })
   ],
