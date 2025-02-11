@@ -8,7 +8,7 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        format: 'es'
+        format: 'iife'
       }
     }
   },
