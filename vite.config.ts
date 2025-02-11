@@ -23,15 +23,15 @@ export default defineConfig({
         theme_color: '#ffffff',
         icons: [
           {
-            src: './vite.svg',
+            src: '/progressive_app_map/vite.svg',
             sizes: '192x192',
             type: 'image/svg+xml'
           }
         ],
         background_color: '#ffffff',
         display: 'standalone',
-        start_url: './',
-        scope: './'
+        start_url: '/progressive_app_map/',
+        scope: '/progressive_app_map/'
       }
     })
   ],
