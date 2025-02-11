@@ -1,11 +1,23 @@
 import { useEffect, useState } from 'react'
 import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet'
-import 'leaflet/dist/leaflet.css'
 import './App.css'
-import L from 'leaflet'
+import type { Map as LeafletMap, Icon } from 'leaflet'
+import type React from 'react'
+import type ReactDOM from 'react-dom'
+
+declare global {
+  interface Window {
+    React: typeof React;
+    ReactDOM: typeof ReactDOM;
+    L: {
+      icon: (options: any) => Icon;
+      Marker: { prototype: { options: { icon: Icon } } };
+    };
+  }
+}
 
 // Fix Leaflet default marker icon issue
-const DefaultIcon = L.icon({
+const DefaultIcon = window.L.icon({
   iconUrl: `${import.meta.env.BASE_URL}marker-icon.png`,
   iconRetinaUrl: `${import.meta.env.BASE_URL}marker-icon-2x.png`,
   shadowUrl: `${import.meta.env.BASE_URL}marker-shadow.png`,
@@ -15,7 +27,7 @@ const DefaultIcon = L.icon({
   shadowSize: [41, 41]
 })
 
-L.Marker.prototype.options.icon = DefaultIcon
+window.L.Marker.prototype.options.icon = DefaultIcon
 
 function LocationMarker() {
   const [position, setPosition] = useState<[number, number] | null>(null)
