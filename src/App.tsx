@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet'
 import './App.css'
-import type { Map as LeafletMap, Icon } from 'leaflet'
+import type { Icon, LatLngExpression, Map } from 'leaflet'
 import type React from 'react'
 import type ReactDOM from 'react-dom'
 
@@ -12,6 +12,7 @@ declare global {
     L: {
       icon: (options: any) => Icon;
       Marker: { prototype: { options: { icon: Icon } } };
+      Map: typeof Map;
     };
   }
 }
@@ -30,7 +31,7 @@ const DefaultIcon = window.L.icon({
 window.L.Marker.prototype.options.icon = DefaultIcon
 
 function LocationMarker() {
-  const [position, setPosition] = useState<[number, number] | null>(null)
+  const [position, setPosition] = useState<LatLngExpression | null>(null)
   const map = useMap()
 
   useEffect(() => {
@@ -46,7 +47,7 @@ function LocationMarker() {
 }
 
 function App() {
-  const defaultPosition: [number, number] = [51.505, -0.09] // Default to London
+  const defaultPosition: LatLngExpression = [51.505, -0.09] // Default to London
 
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative' }}>
