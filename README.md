@@ -20,14 +20,7 @@ npm run dev
 
 The app will be available at http://localhost:5173
 
-## Backend API
+## Deployment
 
-The backend is built with FastAPI. To run the backend server:
-
-```bash
-cd backend
-poetry install
-poetry run fastapi dev app/main.py
-```
-
-The API will be available at http://localhost:8000
+The app is deployed as a static website on GitHub Pages and can be accessed at:
+https://dulani.github.io/progressive_app_map/
