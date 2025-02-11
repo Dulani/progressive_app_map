@@ -5,6 +5,13 @@ import { VitePWA } from 'vite-plugin-pwa'
 // https://vite.dev/config/
 export default defineConfig({
   base: '/progressive_app_map/',
+  build: {
+    rollupOptions: {
+      output: {
+        format: 'iife'
+      }
+    }
+  },
   plugins: [
     react(),
     VitePWA({
