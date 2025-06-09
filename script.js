@@ -19,21 +19,32 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' // Added "contributors"
 }).addTo(map);
 
-// Disable weather toggle if API key is missing
+// --- DOM Element References ---
+// It's good practice to get all DOM element references together after the DOM is loaded,
+// or ensure they are available. For this script, elements are in HTML so should be fine.
+const geolocateBtn = document.getElementById('geolocateBtn');
+const fileInput = document.getElementById('fileInput');
+const loadRouteBtn = document.getElementById('loadRouteBtn');
+const saveRouteBtn = document.getElementById('saveRouteBtn');
+const weatherToggle = document.getElementById('weatherToggle');
+const gasPriceToggle = document.getElementById('gasPriceToggle');
+
+// --- Initial Setup ---
+
+// Disable weather toggle if API key is missing and provide feedback
 if (OWM_API_KEY === 'YOUR_API_KEY_HERE') {
-    const weatherToggle = document.getElementById('weatherToggle');
     if (weatherToggle) {
         weatherToggle.disabled = true;
         const weatherLabel = document.querySelector('label[for="weatherToggle"]');
         if (weatherLabel) {
-            weatherLabel.title = 'OpenWeatherMap API key is not set in script.js';
+            weatherLabel.title = 'OpenWeatherMap API key is not set in script.js. Weather functionality is disabled.';
         }
     }
 }
 
-// Geolocation functionality
-const geolocateBtn = document.getElementById('geolocateBtn');
+// --- Event Listeners ---
 
+// Geolocation
 if (geolocateBtn) {
     geolocateBtn.addEventListener('click', () => {
         if (navigator.geolocation) {
@@ -58,10 +69,6 @@ if (geolocateBtn) {
 }
 
 // File and Route Handling
-const fileInput = document.getElementById('fileInput');
-const loadRouteBtn = document.getElementById('loadRouteBtn');
-const saveRouteBtn = document.getElementById('saveRouteBtn');
-
 if (fileInput) {
     fileInput.addEventListener('change', (event) => {
         const file = event.target.files[0];
@@ -166,12 +173,10 @@ if (saveRouteBtn) {
 }
 
 // Weather Layer Functionality
-const weatherToggle = document.getElementById('weatherToggle');
-
 function updateWeather() {
-    const weatherToggle = document.getElementById('weatherToggle'); // Get inside function to ensure it's available
+    // weatherToggle is now accessed from the global scope (defined in "DOM Element References")
 
-    if (!weatherToggle || !weatherToggle.checked) {
+    if (!weatherToggle || !weatherToggle.checked) { // weatherToggle here refers to the global const
         weatherLayer.clearLayers();
         if (map.hasLayer(weatherLayer)) { // Only remove if it was added
             map.removeLayer(weatherLayer);
@@ -179,12 +184,12 @@ function updateWeather() {
         return;
     }
 
-    if (OWM_API_KEY === 'YOUR_API_KEY_HERE') {
-        // This state should ideally be prevented by disabling the checkbox if key is missing
+    if (OWM_API_KEY === 'YOUR_API_KEY_HERE') { // This check is good
+        // This state should ideally be prevented by the initial disabling of the checkbox
         alert('OpenWeatherMap API key is not set. Please configure it in script.js.');
-        if (weatherToggle) weatherToggle.checked = false;
+        if (weatherToggle) weatherToggle.checked = false; // Uncheck if somehow it got checked
         weatherLayer.clearLayers();
-        if (map.hasLayer(weatherLayer)) map.removeLayer(weatherLayer);
+        if (map.hasLayer(weatherLayer)) map.removeLayer(weatherLayer); // Clean up map
         return;
     }
 
@@ -237,10 +242,10 @@ function updateWeather() {
         });
 }
 
-const weatherToggle = document.getElementById('weatherToggle'); // Define once outside if not already
-if (weatherToggle && !weatherToggle.disabled) { // Only add listener if not disabled
+// The global weatherToggle is used here for the event listener
+if (weatherToggle && !weatherToggle.disabled) {
     weatherToggle.addEventListener('change', () => {
-        if (weatherToggle.checked) {
+        if (weatherToggle.checked) { // Refers to the global weatherToggle
             if (!map.hasLayer(weatherLayer)) { // Add to map if not already present
                 weatherLayer.addTo(map);
             }
@@ -255,25 +260,22 @@ if (weatherToggle && !weatherToggle.disabled) { // Only add listener if not disa
 }
 
 map.on('moveend', () => {
-    const weatherToggle = document.getElementById('weatherToggle'); // Get fresh reference
+    // weatherToggle and gasPriceToggle are now accessed from the global scope
     if (weatherToggle && weatherToggle.checked && !weatherToggle.disabled) {
         updateWeather();
     }
-    const gasPriceToggle = document.getElementById('gasPriceToggle'); // Get fresh reference
-    if (gasPriceToggle && gasPriceToggle.checked) {
+    if (gasPriceToggle && gasPriceToggle.checked) { // Assuming gasPriceToggle doesn't have a disabled state managed yet
         updateGasPrices();
     }
 });
 
 // Gas Price Layer Functionality (Placeholder)
-const gasPriceToggle = document.getElementById('gasPriceToggle');
-
 function updateGasPrices() {
-    const gasPriceToggle = document.getElementById('gasPriceToggle'); // Get fresh reference
+    // gasPriceToggle is now accessed from the global scope
 
-    if (!gasPriceToggle || !gasPriceToggle.checked) {
+    if (!gasPriceToggle || !gasPriceToggle.checked) { // gasPriceToggle here refers to the global const
         gasPriceLayer.clearLayers();
-        if (map.hasLayer(gasPriceLayer)) { // Only remove if it was added
+        if (map.hasLayer(gasPriceLayer)) {
             map.removeLayer(gasPriceLayer);
         }
         return;
@@ -308,10 +310,10 @@ function updateGasPrices() {
     // --- END OF PLACEHOLDER ---
 }
 
-const gasPriceToggle = document.getElementById('gasPriceToggle'); // Define once outside
+// The global gasPriceToggle is used here
 if (gasPriceToggle) {
     gasPriceToggle.addEventListener('change', () => {
-        if (gasPriceToggle.checked) {
+        if (gasPriceToggle.checked) { // Refers to the global gasPriceToggle
             if (!map.hasLayer(gasPriceLayer)) { // Add to map if not already present
                 gasPriceLayer.addTo(map);
             }
