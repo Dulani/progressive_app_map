@@ -1,0 +1,56 @@
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    text-align: center; /* Center content like the button */
+}
+
+h1 {
+    margin: 10px 0;
+}
+
+#geolocateBtn {
+    padding: 10px 15px;
+    font-size: 1em;
+    margin-bottom: 10px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f8f8f8;
+}
+
+#geolocateBtn:hover {
+    background-color: #e8e8e8;
+}
+
+#controls {
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+#controls input[type="file"] {
+    margin-right: 10px;
+}
+
+#controls button {
+    padding: 8px 12px;
+    font-size: 0.9em;
+    margin-left: 5px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #eee;
+}
+
+#controls button:hover {
+    background-color: #ddd;
+}
+
+#map {
+    width: 100%;
+    height: calc(100vh - 150px); /* Adjust map height to accommodate controls */
+    border: 1px solid black;
+}

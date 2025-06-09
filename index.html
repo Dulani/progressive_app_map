@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline Map PWA</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <h1>Offline Map PWA</h1>
+    <button id="geolocateBtn">Center on My Location</button>
+    <div id="controls">
+        <input type="file" id="fileInput" accept=".gpx,.kml">
+        <button id="loadRouteBtn">Load Last Saved Route</button>
+        <button id="saveRouteBtn">Save Current Route</button>
+        <br>
+        <input type="checkbox" id="weatherToggle"> <label for="weatherToggle">Show Weather</label>
+        <br>
+        <input type="checkbox" id="gasPriceToggle"> <label for="gasPriceToggle">Show Gas Prices</label>
+    </div>
+    <div id="map"></div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://unpkg.com/@tmcw/togeojson@5.8.1/dist/togeojson.umd.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
