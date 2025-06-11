@@ -17,8 +17,12 @@
         <button id="saveRouteBtn">Save Current Route</button>
         <br>
         <input type="checkbox" id="weatherToggle"> <label for="weatherToggle">Show Weather</label>
+        <input type="text" id="owmApiKeyInput" placeholder="Enter OpenWeatherMap API Key" style="margin-left: 10px; width: 250px;">
+        <button id="saveOwmApiKeyBtn">Save OWM Key</button>
         <br>
         <input type="checkbox" id="gasPriceToggle"> <label for="gasPriceToggle">Show Gas Prices</label>
+        <br>
+        <input type="checkbox" id="nexradRadarToggle"> <label for="nexradRadarToggle">Show NEXRAD Radar (USA)</label>
     </div>
     <div id="map"></div>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
