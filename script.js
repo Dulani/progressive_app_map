@@ -67,43 +67,68 @@ document.addEventListener('DOMContentLoaded', function() {
     updateWeatherToggleState(); // Call after loading key
 
 
+    // Builds a popup element using textContent so names/descriptions from
+    // user-supplied files can never be interpreted as HTML.
+    function textPopup(text) {
+        const el = document.createElement('div');
+        el.textContent = text;
+        return el;
+    }
+
+    // Replaces the current route layer with the given GeoJSON and zooms to it.
+    // Returns false (leaving the map untouched) if there's nothing to draw.
+    function renderRoute(geojson) {
+        if (!geojson || !Array.isArray(geojson.features) || geojson.features.length === 0) {
+            return false;
+        }
+        const layer = L.geoJSON(geojson, {
+            onEachFeature: function (feature, featureLayer) {
+                const props = feature.properties || {};
+                featureLayer.bindPopup(textPopup(props.name || props.desc || 'Route Feature'));
+            }
+        });
+        const bounds = layer.getBounds();
+        if (!bounds.isValid()) return false;
+
+        if (currentRouteLayer) map.removeLayer(currentRouteLayer);
+        currentRouteLayer = layer.addTo(map);
+        map.fitBounds(bounds);
+        return true;
+    }
+
     function loadLastSavedRoute() {
         const savedRoute = localStorage.getItem('savedRouteGeoJSON');
-        if (savedRoute) {
-            try {
-                const geojsonData = JSON.parse(savedRoute);
-                if (currentRouteLayer) {
-                    map.removeLayer(currentRouteLayer);
-                }
-                currentRouteLayer = L.geoJSON(geojsonData, {
-                    onEachFeature: function (feature, layer) {
-                        let popupContent = "Route Feature";
-                        if (feature.properties) {
-                            if (feature.properties.name) popupContent = feature.properties.name;
-                            else if (feature.properties.desc) popupContent = feature.properties.desc;
-                        }
-                        layer.bindPopup(popupContent);
-                    }
-                }).addTo(map);
-                map.fitBounds(currentRouteLayer.getBounds());
-                alert('Route loaded from local storage!');
-            } catch (error) {
-                console.error('Error parsing saved route from localStorage:', error);
-                alert('Could not load saved route. Data might be corrupted. The corrupted route has been removed.');
-                localStorage.removeItem('savedRouteGeoJSON');
-            }
-        } else {
+        if (!savedRoute) {
             alert('No saved route found in local storage.');
+            return;
+        }
+        let geojsonData;
+        try {
+            geojsonData = JSON.parse(savedRoute);
+        } catch (error) {
+            console.error('Error parsing saved route from localStorage:', error);
+            alert('Could not load saved route. Data is corrupted and has been removed.');
+            localStorage.removeItem('savedRouteGeoJSON');
+            return;
+        }
+        if (renderRoute(geojsonData)) {
+            alert('Route loaded from local storage!');
+        } else {
+            alert('The saved route has no drawable features.');
         }
     }
 
     function saveCurrentRoute() {
-        if (currentRouteLayer) {
-            const geojsonData = currentRouteLayer.toGeoJSON();
-            localStorage.setItem('savedRouteGeoJSON', JSON.stringify(geojsonData));
-            alert('Current route saved to local storage!');
-        } else {
+        if (!currentRouteLayer) {
             alert('No current route to save.');
+            return;
+        }
+        try {
+            localStorage.setItem('savedRouteGeoJSON', JSON.stringify(currentRouteLayer.toGeoJSON()));
+            alert('Current route saved to local storage!');
+        } catch (error) {
+            console.error('Error saving route:', error);
+            alert('Could not save the route. It may be too large for browser storage.');
         }
     }
 
@@ -189,34 +214,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const fileName = file.name.toLowerCase();
-                    const domParser = new DOMParser();
-                    const xmlDoc = domParser.parseFromString(e.target.result, 'text/xml');
+                    const xmlDoc = new DOMParser().parseFromString(e.target.result, 'text/xml');
+                    // DOMParser doesn't throw on bad XML; it returns a document containing <parsererror>.
+                    if (xmlDoc.getElementsByTagName('parsererror').length > 0) {
+                        alert('This file is not valid XML. Please select a valid GPX or KML file.');
+                        return;
+                    }
                     let geojson;
                     try {
                         if (fileName.endsWith('.gpx')) geojson = toGeoJSON.gpx(xmlDoc);
                         else if (fileName.endsWith('.kml')) geojson = toGeoJSON.kml(xmlDoc);
                         else { alert('Unsupported file type. Please select a .gpx or .kml file.'); return; }
-
-                        if (currentRouteLayer) map.removeLayer(currentRouteLayer);
-                        currentRouteLayer = L.geoJSON(geojson, {
-                            onEachFeature: function (feature, layer) {
-                                let popupContent = "Route Feature";
-                                if (feature.properties) {
-                                    if (feature.properties.name) popupContent = feature.properties.name;
-                                    else if (feature.properties.desc) popupContent = feature.properties.desc;
-                                }
-                                layer.bindPopup(popupContent);
-                            }
-                        }).addTo(map);
-                        map.fitBounds(currentRouteLayer.getBounds());
-                        alert('Route loaded successfully!');
                     } catch (parseError) {
-                        console.error('Error parsing/displaying GPX/KML file:', parseError);
-                        alert(`Error processing file: ${parseError.message}. Make sure the file is a valid GPX or KML.`);
+                        console.error('Error converting GPX/KML file:', parseError);
+                        alert(`Error processing file: ${parseError.message}`);
+                        return;
+                    }
+                    if (renderRoute(geojson)) {
+                        alert('Route loaded successfully!');
+                    } else {
+                        alert('No tracks, routes, or points were found in this file.');
                     }
                 };
                 reader.onerror = function() { alert('Error reading file.'); };
                 reader.readAsText(file);
+                fileInput.value = ''; // Allow re-selecting the same file
             }
         });
     }
