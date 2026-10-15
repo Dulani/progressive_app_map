@@ -12,22 +12,34 @@
     <link rel="apple-touch-icon" href="icons/icon-192.png">
 </head>
 <body>
-    <h1>Offline Map PWA</h1>
-    <button id="geolocateBtn">Center on My Location</button>
-    <div id="controls">
-        <input type="file" id="fileInput" accept=".gpx,.kml">
-        <button id="loadRouteBtn">Load Last Saved Route</button>
-        <button id="saveRouteBtn">Save Current Route</button>
-        <br>
-        <input type="checkbox" id="weatherToggle"> <label for="weatherToggle">Show Weather</label>
-        <input type="text" id="owmApiKeyInput" placeholder="Enter OpenWeatherMap API Key" style="margin-left: 10px; width: 250px;">
-        <button id="saveOwmApiKeyBtn">Save OWM Key</button>
-        <br>
-        <input type="checkbox" id="gasPriceToggle"> <label for="gasPriceToggle">Show Gas Prices</label>
-        <br>
-        <input type="checkbox" id="nexradRadarToggle"> <label for="nexradRadarToggle">Show NEXRAD Radar (USA)</label>
-    </div>
+    <header>
+        <h1>Offline Map PWA</h1>
+        <button id="geolocateBtn">Center on My Location</button>
+    </header>
+    <details id="controls" open>
+        <summary>Routes &amp; layers</summary>
+        <div class="control-row">
+            <input type="file" id="fileInput" accept=".gpx,.kml">
+            <button id="loadRouteBtn">Load Last Saved Route</button>
+            <button id="saveRouteBtn">Save Current Route</button>
+        </div>
+        <div class="control-row">
+            <label><input type="checkbox" id="weatherToggle"> Show Weather</label>
+            <select id="weatherLayerSelect" aria-label="Weather layer">
+                <option value="precipitation_new">Precipitation</option>
+                <option value="clouds_new">Clouds</option>
+                <option value="temp_new">Temperature</option>
+                <option value="wind_new">Wind</option>
+            </select>
+            <input type="text" id="owmApiKeyInput" placeholder="OpenWeatherMap API Key" autocomplete="off">
+            <button id="saveOwmApiKeyBtn">Save OWM Key</button>
+        </div>
+        <div class="control-row">
+            <label><input type="checkbox" id="nexradRadarToggle"> Show NEXRAD Radar (USA)</label>
+        </div>
+    </details>
     <div id="map"></div>
+    <div id="toast" role="status" aria-live="polite"></div>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="https://unpkg.com/@tmcw/togeojson@5.8.1/dist/togeojson.umd.js" integrity="sha384-4a+9x4ql6wch9epMfqnC3bSjASMJDDqpSuVblbNd6thkfnwdBucHgePPyl0exaFY" crossorigin=""></script>
     <script src="script.js"></script>

@@ -1,18 +1,35 @@
+html, body {
+    height: 100%;
+}
+
 body {
     font-family: sans-serif;
     margin: 0;
     padding: 0;
-    text-align: center; /* Center content like the button */
+    text-align: center;
+    /* Column layout: header and controls take what they need, the map fills the rest. */
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+}
+
+header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px 16px;
+    padding: 6px 8px;
 }
 
 h1 {
-    margin: 10px 0;
+    margin: 0;
+    font-size: 1.4em;
 }
 
 #geolocateBtn {
-    padding: 10px 15px;
+    padding: 8px 14px;
     font-size: 1em;
-    margin-bottom: 10px;
     cursor: pointer;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -24,21 +41,38 @@ h1 {
 }
 
 #controls {
-    margin-bottom: 10px;
-    padding: 10px;
+    margin: 0 8px 8px;
+    padding: 6px 10px;
     border: 1px solid #ddd;
     border-radius: 5px;
     background-color: #f9f9f9;
+    max-height: 40vh;
+    overflow-y: auto;
 }
 
-#controls input[type="file"] {
-    margin-right: 10px;
+#controls summary {
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.control-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 6px 10px;
+    margin-top: 8px;
+}
+
+#controls input[type="text"] {
+    width: 16em;
+    max-width: 100%;
+    padding: 6px;
 }
 
 #controls button {
     padding: 8px 12px;
     font-size: 0.9em;
-    margin-left: 5px;
     cursor: pointer;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -50,7 +84,34 @@ h1 {
 }
 
 #map {
+    flex: 1;
+    min-height: 200px;
     width: 100%;
-    height: calc(100vh - 150px); /* Adjust map height to accommodate controls */
-    border: 1px solid black;
+    border-top: 1px solid black;
+}
+
+/* Non-blocking status messages (replaces alert()). */
+#toast {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%);
+    z-index: 1000;
+    max-width: calc(100% - 32px);
+    padding: 10px 16px;
+    border-radius: 6px;
+    background: #333;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+}
+
+#toast.visible {
+    opacity: 1;
+}
+
+#toast.error {
+    background: #b42318;
 }
