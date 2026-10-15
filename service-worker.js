@@ -1,7 +1,9 @@
 // Service worker: precaches the app shell and caches viewed map tiles for offline use.
 
-const SHELL_CACHE = 'shell-v1';
+const SHELL_CACHE = 'shell-v2';
 const TILE_CACHE = 'tiles-v1';
+const DATA_CACHE = 'data-v1';
+const MAX_DATA_RESPONSES = 300;
 const MAX_TILES = 2000; // OSM tile policy forbids bulk prefetch; only cache tiles the user has viewed.
 
 const SHELL_ASSETS = [
@@ -32,7 +34,7 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys()
       .then((keys) => Promise.all(
-        keys.filter((key) => key !== SHELL_CACHE && key !== TILE_CACHE).map((key) => caches.delete(key))
+        keys.filter((key) => ![SHELL_CACHE, TILE_CACHE, DATA_CACHE].includes(key)).map((key) => caches.delete(key))
       ))
       .then(() => self.clients.claim())
   );
@@ -40,6 +42,37 @@ self.addEventListener('activate', (event) => {
 
 function isOsmTile(url) {
   return url.hostname === 'tile.openstreetmap.org';
+}
+
+// Overpass (mailbox) queries. The app snaps query areas to a grid, so the same area is
+// always the same URL and can be served from cache when offline or when servers are down.
+function isOverpassQuery(url) {
+  return url.pathname.endsWith('/api/interpreter') && url.searchParams.has('data');
+}
+
+// Cache key ignores which mirror answered, so a response from any server can be reused.
+function overpassCacheKey(url) {
+  return 'https://overpass.cache/?data=' + encodeURIComponent(url.searchParams.get('data'));
+}
+
+// Mailbox data: network-first, falling back to the last response for the same area.
+async function handleOverpass(request) {
+  const cache = await caches.open(DATA_CACHE);
+  const key = overpassCacheKey(new URL(request.url));
+  try {
+    const response = await fetch(request);
+    if (response.ok) {
+      await cache.put(key, response.clone());
+      trimCache(DATA_CACHE, MAX_DATA_RESPONSES);
+      return response;
+    }
+    const cached = await cache.match(key);
+    return cached || response;
+  } catch (error) {
+    const cached = await cache.match(key);
+    if (cached) return cached;
+    throw error;
+  }
 }
 
 async function trimCache(cacheName, maxEntries) {
@@ -88,8 +121,10 @@ self.addEventListener('fetch', (event) => {
 
   if (isOsmTile(url)) {
     event.respondWith(handleTile(request));
+  } else if (isOverpassQuery(url)) {
+    event.respondWith(handleOverpass(request));
   } else if (url.origin === self.location.origin || SHELL_ASSETS.includes(request.url)) {
     event.respondWith(handleShell(request));
   }
-  // Everything else (weather, radar, Overpass) goes straight to the network.
+  // Everything else (weather, radar) goes straight to the network.
 });
