@@ -301,7 +301,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Register service worker
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => { // Use window.load for SW registration to ensure page is fully loaded
-            navigator.serviceWorker.register('/service-worker.js')
+            navigator.serviceWorker.register('service-worker.js')
                 .then(registration => { console.log('ServiceWorker registration successful with scope: ', registration.scope); })
                 .catch(error => { console.log('ServiceWorker registration failed: ', error); });
         });
